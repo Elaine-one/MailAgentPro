@@ -1,0 +1,7 @@
+PySide6
+langchain
+langchain_openai
+openai
+cryptography
+sqlalchemy
+pandas
