@@ -23,6 +23,8 @@ from sqlalchemy.pool import QueuePool, NullPool
 from sqlalchemy.exc import DisconnectionError, TimeoutError
 import logging
 
+from core.path_manager import get_path_manager
+
 # 数据库错误分类
 class DatabaseError(Exception):
     """数据库错误基类"""
@@ -203,11 +205,12 @@ class DBManager:
         self._initialized = True
         self.logger = logging.getLogger(__name__)
         
-        # 使用绝对路径，避免相对路径问题
+        # 使用路径管理器获取数据库路径
+        path_manager = get_path_manager()
+        
         if db_path is None:
-            # 默认使用app目录下的数据库文件
-            app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            db_path = os.path.join(app_dir, "mail_sender.db")
+            # 使用路径管理器的默认数据库路径
+            db_path = str(path_manager.get_db_path())
         else:
             # 如果是相对路径，转换为绝对路径
             if not os.path.isabs(db_path):

@@ -7,10 +7,11 @@ AI助手组件 - 独立的AI功能模块
 
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QFormLayout, 
                                QLabel, QLineEdit, QPushButton, QMessageBox, 
-                               QTextEdit, QComboBox, QGroupBox)
+                               QTextEdit, QGroupBox)
 from PySide6.QtCore import Qt
 from core.ai_writer import SmartLLMClient
 from ui.modern_styles import MODERN_FLAT_STYLE
+from ui.wheel_combo import WheelComboBox
 
 
 class AIAssistantWidget(QWidget):
@@ -33,22 +34,25 @@ class AIAssistantWidget(QWidget):
         settings_layout = QFormLayout(settings_group)
         
         # 模型供应商选择
-        self.provider_combo = QComboBox()
+        self.provider_combo = WheelComboBox()
         self.provider_combo.setProperty("class", "combo-box")
+        self.provider_combo.setMaxVisibleItems(10)
         self.provider_combo.addItems(["自动检测", "OpenAI", "通义千问", "Moonshot"])
         self.provider_combo.setToolTip("选择AI模型供应商，或选择自动检测让系统根据API Key自动识别")
         self.provider_combo.currentTextChanged.connect(self._on_provider_changed)
         
         # 模型选择
-        self.ai_model_combo = QComboBox()
+        self.ai_model_combo = WheelComboBox()
         self.ai_model_combo.setProperty("class", "combo-box")
+        self.ai_model_combo.setMaxVisibleItems(10)
         self.ai_model_combo.setToolTip("选择具体的AI模型")
         
         # 初始化模型列表
         self._update_model_list()
         
-        self.tone_combo = QComboBox()
+        self.tone_combo = WheelComboBox()
         self.tone_combo.setProperty("class", "combo-box")
+        self.tone_combo.setMaxVisibleItems(10)
         self.tone_combo.addItems(["正式", "随意", "友好", "专业"])
         
         settings_layout.addRow("供应商:", self.provider_combo)
@@ -81,8 +85,9 @@ class AIAssistantWidget(QWidget):
         # 语气调整
         self.tone_btn = QPushButton("调整语气")
         self.tone_btn.setProperty("class", "primary")
-        self.tone_adjust_combo = QComboBox()
+        self.tone_adjust_combo = WheelComboBox()
         self.tone_adjust_combo.setProperty("class", "combo-box")
+        self.tone_adjust_combo.setMaxVisibleItems(10)
         self.tone_adjust_combo.addItems(["正式", "随意", "友好", "专业"])
         
         tone_layout = QHBoxLayout()

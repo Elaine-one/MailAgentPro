@@ -8,12 +8,13 @@
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QFormLayout, 
                                QLabel, QLineEdit, QPushButton, QMessageBox, 
                                QFileDialog, QTextEdit, QTableWidget, QTableWidgetItem,
-                               QComboBox, QGroupBox, QProgressBar, QSpinBox,
+                               QGroupBox, QProgressBar, QSpinBox,
                                QDoubleSpinBox, QCheckBox, QTabWidget, QSplitter, QHeaderView, QWidget)
 from PySide6.QtCore import Qt, QTimer, QThread, Signal
 from PySide6.QtGui import QClipboard
 from PySide6.QtWidgets import QApplication
 from ui.modern_styles import MODERN_FLAT_STYLE
+from ui.wheel_combo import WheelComboBox
 import os
 import time
 from core.mail_sender import MailSender
@@ -157,14 +158,16 @@ class AISettingsDialog(QDialog):
         main_layout = QFormLayout(main_group)
         
         # 模型供应商选择
-        self.provider_combo = QComboBox()
+        self.provider_combo = WheelComboBox()
         self.provider_combo.setProperty("class", "combo-box")
+        self.provider_combo.setMaxVisibleItems(10)
         self.provider_combo.addItems(["自动检测", "OpenAI", "通义千问", "Moonshot"])
         self.provider_combo.currentTextChanged.connect(self._on_provider_changed)
         
         # 具体模型选择
-        self.model_combo = QComboBox()
+        self.model_combo = WheelComboBox()
         self.model_combo.setProperty("class", "combo-box")
+        self.model_combo.setMaxVisibleItems(10)
         self.model_combo.setToolTip("选择具体的AI模型")
         
         self.primary_key_input = QLineEdit()
@@ -565,14 +568,16 @@ class AIGenerateDialog(QDialog):
         # 参数设置
         params_layout = QHBoxLayout()
         params_layout.addWidget(QLabel("语气:"))
-        self.tone_combo = QComboBox()
+        self.tone_combo = WheelComboBox()
         self.tone_combo.setProperty("class", "combo-box")
+        self.tone_combo.setMaxVisibleItems(10)
         self.tone_combo.addItems(["formal", "casual", "friendly", "professional"])
         params_layout.addWidget(self.tone_combo)
         
         params_layout.addWidget(QLabel("语言:"))
-        self.language_combo = QComboBox()
+        self.language_combo = WheelComboBox()
         self.language_combo.setProperty("class", "combo-box")
+        self.language_combo.setMaxVisibleItems(10)
         self.language_combo.addItems(["zh", "en"])
         params_layout.addWidget(self.language_combo)
         

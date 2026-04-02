@@ -22,6 +22,24 @@ QWidget {
     color: #3c4043;
 }
 
+/* 全局 QAbstractItemView 样式 - 确保下拉框和列表没有多余边框 */
+QAbstractItemView {
+    border: none;
+    outline: none;
+}
+
+QAbstractItemView QWidget {
+    border: none;
+}
+
+QAbstractScrollArea {
+    border: none;
+}
+
+QAbstractScrollArea QWidget {
+    border: none;
+}
+
 /* 主窗口样式 - 优化视觉效果 */
 QMainWindow {
     background-color: #f8f9fa;
@@ -221,20 +239,22 @@ QComboBox::down-arrow, .combo-box::down-arrow {
     height: 8px;
 }
 
-/* 下拉列表视图样式 - 彻底消除嵌套感 */
+/* 下拉列表视图样式 - 彻底消除多层边框 */
 QComboBox QAbstractItemView {
-    border: 1px solid #dadce0;
+    border: none !important;
+    border-radius: 0px !important;
     background-color: #ffffff;
     outline: none;
     selection-background-color: #e8f0fe;
+    selection-color: #1a73e8;
     padding: 0px;
     margin: 0px;
-    border-radius: 6px;
+    alternate-background-color: #ffffff;
 }
 
 QComboBox QAbstractItemView::item {
     height: 32px;
-    padding: 0px 12px;
+    padding: 0px 16px;
     color: #3c4043;
     border: none;
     background-color: transparent;
@@ -251,8 +271,97 @@ QComboBox QAbstractItemView::item:hover {
     background-color: #f1f3f4;
 }
 
-/* 列表和表格样式 */
-QListWidget, QTableWidget, .list, .table {
+/* QComboBox 弹出窗口和内部控件样式 - 彻底消除所有边框和阴影 */
+QComboBox QAbstractItemView QWidget {
+    border: none !important;
+    background-color: #ffffff;
+}
+
+QComboBox QAbstractItemView::viewport {
+    border: none !important;
+    background-color: #ffffff;
+}
+
+/* 移除滚动条箭头 */
+QComboBox QAbstractItemView QScrollBar::up-arrow,
+QComboBox QAbstractItemView QScrollBar::down-arrow {
+    width: 0px;
+    height: 0px;
+    border: none;
+    background: none;
+}
+
+QComboBox QAbstractItemView QScrollBar::add-line,
+QComboBox QAbstractItemView QScrollBar::sub-line {
+    width: 0px;
+    height: 0px;
+    border: none;
+    background: none;
+}
+
+/* QAbstractScrollArea 样式 - 确保下拉框不显示边框 */
+QComboBox QAbstractScrollArea {
+    border: none !important;
+}
+
+QComboBox QAbstractScrollArea QWidget {
+    border: none !important;
+}
+
+/* 确保 QScrollBar 不添加额外边框 */
+QComboBox QAbstractItemView QScrollBar {
+    border: none !important;
+}
+
+/* Qt 内部弹出容器样式 - 彻底消除边框和阴影 */
+QComboBoxPrivateContainer {
+    border: none !important;
+    border-radius: 0px !important;
+    background-color: #ffffff;
+    outline: none;
+    outline-offset: 0px;
+}
+
+QComboBoxPrivateContainer QWidget {
+    border: none !important;
+    background-color: #ffffff;
+}
+
+QComboBoxPrivateScroller {
+    border: none !important;
+    border-radius: 0px !important;
+    background-color: #ffffff;
+    outline: none;
+}
+
+QComboBoxPrivateScroller QWidget {
+    border: none !important;
+    background-color: #ffffff;
+}
+
+/* 下拉框禁用状态 */
+QComboBox:disabled, .combo-box:disabled {
+    background-color: #f8f9fa;
+    color: #9aa0a6;
+    border-color: #e9ecef;
+}
+
+/* 下拉框焦点状态 */
+QComboBox:focus, .combo-box:focus {
+    border: 2px solid #4285f4;
+    padding: 3px 9px;
+}
+
+/* 列表和表格样式 - 仅在有class时显示边框 */
+.list, .table {
+    border: 1px solid #dadce0;
+    border-radius: 8px;
+    background-color: #ffffff;
+    gridline-color: #f1f3f4;
+    outline: none;
+}
+
+QListWidget.list, QTableWidget.table {
     border: 1px solid #dadce0;
     border-radius: 8px;
     background-color: #ffffff;
@@ -721,6 +830,11 @@ QScrollArea > QWidget > QWidget > QWidget {
     background-color: #ffffff;
 }
 
+/* 侧边栏滚动内容样式 */
+.scroll-content {
+    background-color: #ffffff;
+}
+
 /* 树形控件样式 - 现代化设计 */
 QTreeWidget {
     border: 1px solid #e9ecef;
@@ -814,3 +928,9 @@ QSplitter::handle:hover {
     background-color: #dadce0;
 }
 """
+
+
+def setup_combo_box(combo):
+    """统一设置 QComboBox/WheelComboBox 样式"""
+    combo.setProperty("class", "combo-box")
+    combo.setMaxVisibleItems(10)

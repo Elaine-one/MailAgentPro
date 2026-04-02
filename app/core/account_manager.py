@@ -11,25 +11,27 @@ import smtplib
 from cryptography.fernet import Fernet
 from db.db_manager import get_db_manager, Account
 from datetime import datetime
-
-# 密钥文件路径
-KEY_FILE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'encryption.key')
+from core.path_manager import get_path_manager
 
 def _load_or_generate_key():
     """加载或生成加密密钥"""
+    # 使用路径管理器获取密钥文件路径
+    path_manager = get_path_manager()
+    key_file_path = str(path_manager.get_encryption_key_path())
+    
     # 确保data目录存在
-    key_dir = os.path.dirname(KEY_FILE_PATH)
+    key_dir = os.path.dirname(key_file_path)
     if not os.path.exists(key_dir):
         os.makedirs(key_dir)
     
     # 如果密钥文件存在，则加载
-    if os.path.exists(KEY_FILE_PATH):
-        with open(KEY_FILE_PATH, 'rb') as f:
+    if os.path.exists(key_file_path):
+        with open(key_file_path, 'rb') as f:
             return f.read()
     
     # 否则生成新密钥并保存
     new_key = Fernet.generate_key()
-    with open(KEY_FILE_PATH, 'wb') as f:
+    with open(key_file_path, 'wb') as f:
         f.write(new_key)
     return new_key
 

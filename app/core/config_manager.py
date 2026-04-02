@@ -9,6 +9,7 @@
 import json
 import os
 from typing import Dict, Any, Optional
+from core.path_manager import get_path_manager
 
 class ConfigManager:
     """配置管理器类"""
@@ -26,9 +27,9 @@ class ConfigManager:
     def __init__(self):
         """初始化配置管理器"""
         if ConfigManager._config is None:
-            # 确定配置文件路径
-            app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            ConfigManager._config_file = os.path.join(app_dir, 'config.json')
+            # 使用路径管理器获取配置文件路径
+            path_manager = get_path_manager()
+            ConfigManager._config_file = str(path_manager.get_config_path())
             ConfigManager._config = self._load_config()
     
     def _load_config(self) -> Dict[str, Any]:
