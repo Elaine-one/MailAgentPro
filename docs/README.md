@@ -240,7 +240,8 @@ python app/main.py
 ## 📧 联系方式
 
 - 技术支持：elaine
-- 问题反馈：通过 GitHub Issue 提交
+- 邮箱：onee20589@gmail.com
+- GitHub：https://github.com/Elaine-one/MailAgentPro
 
 ---
 
