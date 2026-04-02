@@ -14,12 +14,14 @@ from langchain_openai import ChatOpenAI
 from langchain_community.chat_models import ChatTongyi
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import PromptTemplate
+from core.path_manager import get_path_manager
 
 
 # 配置日志
-log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'logs')
+path_manager = get_path_manager()
+log_dir = str(path_manager.logs_dir)
 os.makedirs(log_dir, exist_ok=True)
-log_file = os.path.join(log_dir, 'llm_errors.log')
+log_file = str(path_manager.get_log_path('llm_errors.log'))
 
 # 创建详细的日志配置
 logger = logging.getLogger('SmartLLMClient')

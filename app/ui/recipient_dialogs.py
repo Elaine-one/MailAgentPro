@@ -8,12 +8,13 @@
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QFormLayout, 
                                QLabel, QLineEdit, QPushButton, QMessageBox, 
                                QFileDialog, QTextEdit, QTableWidget, QTableWidgetItem,
-                               QComboBox, QGroupBox)
+                               QGroupBox)
 from PySide6.QtCore import Qt
 import pandas as pd
 import os
 from core.recipient_manager import RecipientManager
 from ui.modern_styles import MODERN_FLAT_STYLE
+from ui.wheel_combo import WheelComboBox
 
 
 class ImportRecipientsDialog(QDialog):
@@ -54,8 +55,9 @@ class ImportRecipientsDialog(QDialog):
         group_box.setProperty("class", "group-box")
         group_layout = QHBoxLayout(group_box)
         group_layout.addWidget(QLabel("默认分组:"))
-        self.group_combo = QComboBox()
+        self.group_combo = WheelComboBox()
         self.group_combo.setProperty("class", "combo-box")
+        self.group_combo.setMaxVisibleItems(10)
         self.group_combo.setEditable(True)  # 允许手动输入新分组
         self.group_combo.addItem("无分组", "")  # 添加无分组选项
         

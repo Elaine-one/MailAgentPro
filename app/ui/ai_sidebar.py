@@ -8,13 +8,14 @@
 
 import os
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-                               QTextEdit, QLineEdit, QLabel, QComboBox, QFrame,
+                               QTextEdit, QLineEdit, QLabel, QFrame,
                                QScrollArea, QSizePolicy, QButtonGroup, QRadioButton, QApplication,
                                QStackedWidget)
 from PySide6.QtCore import Qt, QTimer, Signal, QThread
 from PySide6.QtGui import QFont
 from core.ai_writer import SmartLLMClient
-from ui.modern_styles import MODERN_FLAT_STYLE
+from ui.modern_styles import MODERN_FLAT_STYLE, setup_combo_box
+from ui.wheel_combo import WheelComboBox
 
 
 class AIWorker(QThread):
@@ -139,7 +140,7 @@ class AISidebar(QWidget):
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         
         scroll_content = QWidget()
-        scroll_content.setStyleSheet("background-color: #ffffff;")
+        scroll_content.setProperty("class", "scroll-content")
         self.content_layout = QVBoxLayout(scroll_content)
         self.content_layout.setContentsMargins(10, 8, 10, 8)
         self.content_layout.setSpacing(8)
@@ -154,9 +155,10 @@ class AISidebar(QWidget):
         func_label.setProperty("class", "sidebar-label")
         func_layout.addWidget(func_label)
         
-        self.function_combo = QComboBox()
+        self.function_combo = WheelComboBox()
         self.function_combo.addItems(["生成邮件", "邮件摘要", "邮件翻译"])
         self.function_combo.currentTextChanged.connect(self.on_function_changed)
+        setup_combo_box(self.function_combo)
         func_layout.addWidget(self.function_combo)
         
         self.content_layout.addWidget(func_group)
@@ -180,8 +182,9 @@ class AISidebar(QWidget):
         t_label = QLabel("邮件类型")
         t_label.setProperty("class", "sidebar-label")
         tl.addWidget(t_label)
-        self.template_combo = QComboBox()
+        self.template_combo = WheelComboBox()
         self.template_combo.addItems(["通用邮件", "商务合作", "会议邀请", "跟进回复", "面试通知"])
+        setup_combo_box(self.template_combo)
         tl.addWidget(self.template_combo)
         mail_layout.addWidget(t_group)
         
@@ -192,8 +195,9 @@ class AISidebar(QWidget):
         r_label = QLabel("收件人关系")
         r_label.setProperty("class", "sidebar-label")
         rl.addWidget(r_label)
-        self.recipient_combo = QComboBox()
+        self.recipient_combo = WheelComboBox()
         self.recipient_combo.addItems(["合作伙伴", "潜在客户", "团队同事", "上级领导"])
+        setup_combo_box(self.recipient_combo)
         rl.addWidget(self.recipient_combo)
         mail_layout.addWidget(r_group)
         
@@ -204,8 +208,9 @@ class AISidebar(QWidget):
         tn_label = QLabel("创作语气")
         tn_label.setProperty("class", "sidebar-label")
         tnl.addWidget(tn_label)
-        self.tone_combo = QComboBox()
+        self.tone_combo = WheelComboBox()
         self.tone_combo.addItems(["专业正式", "亲切友好", "简洁明快", "诚恳礼貌"])
+        setup_combo_box(self.tone_combo)
         tnl.addWidget(self.tone_combo)
         mail_layout.addWidget(tn_group)
         
@@ -222,8 +227,9 @@ class AISidebar(QWidget):
         l_label = QLabel("目标语言")
         l_label.setProperty("class", "sidebar-label")
         ll.addWidget(l_label)
-        self.lang_combo = QComboBox()
+        self.lang_combo = WheelComboBox()
         self.lang_combo.addItems(["英文", "中文", "日文", "韩文", "德文"])
+        setup_combo_box(self.lang_combo)
         ll.addWidget(self.lang_combo)
         trans_layout.addWidget(l_group)
         
@@ -240,8 +246,9 @@ class AISidebar(QWidget):
         st_label = QLabel("摘要重点")
         st_label.setProperty("class", "sidebar-label")
         stl.addWidget(st_label)
-        self.summary_type_combo = QComboBox()
+        self.summary_type_combo = WheelComboBox()
         self.summary_type_combo.addItems(["全文核心", "待办事项", "关键结论"])
+        setup_combo_box(self.summary_type_combo)
         stl.addWidget(self.summary_type_combo)
         summ_layout.addWidget(st_group)
         

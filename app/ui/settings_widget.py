@@ -8,7 +8,7 @@
 import os
 import json
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, 
-                               QFormLayout, QComboBox, QPushButton, QLineEdit, 
+                               QFormLayout, QPushButton, QLineEdit, 
                                QSpinBox, QDoubleSpinBox, QMessageBox, QProgressDialog)
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QClipboard
@@ -16,6 +16,7 @@ from PySide6.QtWidgets import QApplication
 from threading import Thread
 from core.config_manager import ConfigManager
 from ui.modern_styles import MODERN_FLAT_STYLE
+from ui.wheel_combo import WheelComboBox
 
 
 class SettingsWidget(QWidget):
@@ -67,15 +68,18 @@ class SettingsWidget(QWidget):
         ai_layout = QFormLayout(ai_group)
         
         # 模型供应商选择
-        self.provider_combo = QComboBox()
+        self.provider_combo = WheelComboBox()
         self.provider_combo.setProperty("class", "combo-box")
+        self.provider_combo.setMaxVisibleItems(10)
+        self.provider_combo.setEditable(True)
         self.provider_combo.addItems(["自动检测", "OpenAI", "通义千问", "Moonshot"])
         self.provider_combo.setToolTip("选择AI模型供应商，或选择自动检测让系统根据API Key自动识别")
         self.provider_combo.currentTextChanged.connect(self._on_provider_changed)
         
         # 具体模型选择（可编辑）
-        self.model_combo = QComboBox()
+        self.model_combo = WheelComboBox()
         self.model_combo.setProperty("class", "combo-box")
+        self.model_combo.setMaxVisibleItems(10)
         self.model_combo.setEditable(True)
         self.model_combo.setToolTip("选择或输入具体的AI模型名称")
         

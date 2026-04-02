@@ -4,14 +4,15 @@
 """
 
 from PySide6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem, 
-                             QPushButton, QComboBox, QLineEdit, QTextEdit, QLabel, QCheckBox,
+                             QPushButton, QLineEdit, QTextEdit, QLabel, QCheckBox,
                              QDialog, QRadioButton, QMessageBox, QFileDialog, QFormLayout,
                              QListWidget, QListWidgetItem, QGroupBox, QProgressDialog, QInputDialog)
 from PySide6.QtCore import Qt, Signal, QThread, QObject
 from PySide6.QtGui import QFont
 import os
 from datetime import datetime
-from ui.modern_styles import MODERN_FLAT_STYLE
+from ui.modern_styles import MODERN_FLAT_STYLE, setup_combo_box
+from ui.wheel_combo import WheelComboBox
 
 
 class EmailSender(QWidget):
@@ -40,9 +41,9 @@ class EmailSender(QWidget):
         # 账户选择区域
         account_layout = QHBoxLayout()
         account_layout.addWidget(QLabel("发送账户:"))
-        self.account_combo = QComboBox()
-        self.account_combo.setProperty("class", "combo-box")
+        self.account_combo = WheelComboBox()
         self.account_combo.setMinimumWidth(250)
+        setup_combo_box(self.account_combo)
         account_layout.addWidget(self.account_combo)
         account_layout.addStretch()
         layout.addLayout(account_layout)
@@ -106,9 +107,9 @@ class EmailSender(QWidget):
         template_layout = QHBoxLayout()
         template_layout.setSpacing(8)
         template_layout.addWidget(QLabel("模板:"))
-        self.template_combo = QComboBox()
-        self.template_combo.setProperty("class", "combo-box")
+        self.template_combo = WheelComboBox()
         self.template_combo.setMinimumWidth(150)
+        setup_combo_box(self.template_combo)
         template_layout.addWidget(self.template_combo)
         
         self.load_template_btn = QPushButton("加载模板")

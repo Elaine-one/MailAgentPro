@@ -22,6 +22,7 @@ from core.mail_sender import MailSender
 from core.history_tracker import HistoryTracker
 from core.template_manager import TemplateManager
 from core.history_tracker import HistoryTracker
+from core.path_manager import get_path_manager
 from db.db_manager import init_database
 from ui.account_dialogs import AddAccountDialog, EditAccountDialog
 from ui.recipient_dialogs import ImportRecipientsDialog, AddRecipientDialog, EditRecipientDialog
@@ -31,6 +32,41 @@ from ui.ai_assistant_widget import AIAssistantWidget
 from ui.settings_widget import SettingsWidget
 from ui.ai_sidebar import AISidebar
 from ui.modern_styles import MODERN_FLAT_STYLE
+from ui.wheel_combo import WheelComboBox
+
+
+class TemplateSelectDialog(QDialog):
+    """模板选择对话框 - 使用滚轮选择器"""
+    
+    def __init__(self, template_names, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("加载模板")
+        self.setMinimumWidth(300)
+        self.setStyleSheet(MODERN_FLAT_STYLE)
+        
+        layout = QVBoxLayout(self)
+        
+        label = QLabel("请选择模板:")
+        layout.addWidget(label)
+        
+        self.template_combo = WheelComboBox()
+        self.template_combo.addItems(template_names)
+        self.template_combo.setProperty("class", "combo-box")
+        layout.addWidget(self.template_combo)
+        
+        btn_layout = QHBoxLayout()
+        self.ok_btn = QPushButton("确定")
+        self.ok_btn.setProperty("class", "primary")
+        self.ok_btn.clicked.connect(self.accept)
+        self.cancel_btn = QPushButton("取消")
+        self.cancel_btn.setProperty("class", "secondary")
+        self.cancel_btn.clicked.connect(self.reject)
+        btn_layout.addWidget(self.ok_btn)
+        btn_layout.addWidget(self.cancel_btn)
+        layout.addLayout(btn_layout)
+    
+    def get_selected_template(self):
+        return self.template_combo.currentText()
 
 
 class MainWindow(QMainWindow):
@@ -57,9 +93,9 @@ class MainWindow(QMainWindow):
         self.ai_writer = None  # 延迟初始化AI功能
         self.history_tracker = HistoryTracker()
         
-        # 使用绝对路径初始化模板管理器，确保模板保存位置一致
-        app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        template_path = os.path.join(app_dir, 'templates.json')
+        # 使用路径管理器初始化模板管理器，确保模板保存位置一致
+        path_manager = get_path_manager()
+        template_path = str(path_manager.get_templates_path())
         self.template_manager = TemplateManager(template_path)
         
         # 初始化分组管理器
@@ -70,6 +106,9 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.status_bar)
         self.status_bar.showMessage("就绪")
         
+        # 创建菜单栏
+        self.create_menu_bar()
+        
         # 创建侧边栏AI助手
         self.ai_sidebar = AISidebar(self)
         self.ai_sidebar.mail_generated.connect(self.on_mail_generated)
@@ -78,7 +117,135 @@ class MainWindow(QMainWindow):
         # 创建主界面
         self.create_main_ui()
         
-
+    def create_menu_bar(self):
+        """创建菜单栏"""
+        menu_bar = self.menuBar()
+        
+        # 帮助菜单
+        help_menu = menu_bar.addMenu("帮助")
+        
+        # 关于动作
+        about_action = QAction("关于", self)
+        about_action.triggered.connect(self.show_about_dialog)
+        help_menu.addAction(about_action)
+        
+        # 使用说明动作
+        help_action = QAction("使用说明", self)
+        help_action.triggered.connect(self.show_help_dialog)
+        help_menu.addAction(help_action)
+        
+    def show_about_dialog(self):
+        """显示关于对话框"""
+        dialog = QDialog(self)
+        dialog.setWindowTitle("关于 MailAgent Pro")
+        dialog.setFixedSize(450, 350)
+        dialog.setStyleSheet(MODERN_FLAT_STYLE)
+        
+        layout = QVBoxLayout(dialog)
+        layout.setSpacing(15)
+        
+        # 标题
+        title_label = QLabel("MailAgent Pro - 智能邮件助理")
+        title_label.setStyleSheet("font-size: 20px; font-weight: bold; color: #1a73e8;")
+        title_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title_label)
+        
+        # 版本信息
+        version_label = QLabel("版本: 1.0.0")
+        version_label.setStyleSheet("font-size: 12px; color: #5f6368;")
+        version_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(version_label)
+        
+        # 分隔线
+        line = QLabel()
+        line.setFixedHeight(1)
+        line.setStyleSheet("background-color: #dadce0;")
+        layout.addWidget(line)
+        
+        # 功能介绍
+        features_label = QLabel(
+            "📧 智能邮件撰写 - AI 辅助生成专业邮件\n"
+            "👥 收件人管理 - 批量导入与分组管理\n"
+            "📬 多账户支持 - 灵活切换发送账户\n"
+            "📊 发送历史追踪 - 完整记录邮件发送状态\n"
+            "🤖 AI 助手 - 智能摘要、翻译与语气调整"
+        )
+        features_label.setStyleSheet("font-size: 13px; color: #3c4043; line-height: 1.8;")
+        layout.addWidget(features_label)
+        
+        # 技术支持
+        tech_label = QLabel("技术支持: elaine")
+        tech_label.setStyleSheet("font-size: 11px; color: #5f6368;")
+        tech_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(tech_label)
+        
+        layout.addStretch()
+        
+        # 版权信息
+        copyright_label = QLabel("© 2024 MailAgent Pro 保留所有权利")
+        copyright_label.setStyleSheet("font-size: 11px; color: #5f6368;")
+        copyright_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(copyright_label)
+        
+        # 确定按钮
+        ok_btn = QPushButton("确定")
+        ok_btn.setProperty("class", "primary")
+        ok_btn.clicked.connect(dialog.accept)
+        layout.addWidget(ok_btn)
+        
+        dialog.exec()
+        
+    def show_help_dialog(self):
+        """显示使用说明对话框"""
+        dialog = QDialog(self)
+        dialog.setWindowTitle("使用说明")
+        dialog.setFixedSize(550, 450)
+        dialog.setStyleSheet(MODERN_FLAT_STYLE)
+        
+        layout = QVBoxLayout(dialog)
+        layout.setSpacing(10)
+        
+        # 帮助内容
+        help_text = QTextEdit()
+        help_text.setReadOnly(True)
+        help_text.setHtml("""
+        <h3 style="color: #1a73e8;">快速入门指南</h3>
+        
+        <h4>1. 账户管理</h4>
+        <p>• 添加邮箱账户，支持 SMTP 发送</p>
+        <p>• 可添加多个账户，发送时灵活切换</p>
+        
+        <h4>2. 收件人管理</h4>
+        <p>• 支持手动添加或批量导入收件人</p>
+        <p>• 可创建分组，便于批量发送</p>
+        
+        <h4>3. 邮件撰写</h4>
+        <p>• 使用 AI 助手智能生成邮件内容</p>
+        <p>• 支持保存和加载邮件模板</p>
+        <p>• <b>滚轮选择器：</b>使用鼠标滚轮或键盘上下键切换选项</p>
+        
+        <h4>4. 邮件发送</h4>
+        <p>• 选择账户和收件人进行发送</p>
+        <p>• 支持附件添加</p>
+        
+        <h4>5. AI 功能</h4>
+        <p>• 邮件生成：根据主题生成专业邮件</p>
+        <p>• 邮件摘要：提取邮件核心内容</p>
+        <p>• 邮件翻译：支持多语言翻译</p>
+        
+        <h4>6. 设置</h4>
+        <p>• 配置 AI 模型和 API Key</p>
+        <p>• 测试连接确保配置正确</p>
+        """)
+        layout.addWidget(help_text)
+        
+        # 确定按钮
+        ok_btn = QPushButton("确定")
+        ok_btn.setProperty("class", "primary")
+        ok_btn.clicked.connect(dialog.accept)
+        layout.addWidget(ok_btn)
+        
+        dialog.exec()
         
     def create_main_ui(self):
         """创建主界面"""
@@ -749,24 +916,24 @@ class MainWindow(QMainWindow):
                 msg.exec()
                 return
             
-            # 使用下拉框选择模板
+            # 使用自定义对话框选择模板
             template_names = [template['name'] for template in templates]
-            template_name, ok = QInputDialog.getItem(
-                self, "加载模板", "请选择模板:", template_names, 0, False
-            )
+            dialog = TemplateSelectDialog(template_names, self)
             
-            if ok and template_name:
-                template = self.template_manager.get_template_by_name(template_name)
-                if template:
-                    self.subject_input_compose.setText(template.get('subject', ''))
-                    self.body_input.setPlainText(template.get('content', ''))
-                else:
-                    msg = QMessageBox(self)
-                    msg.setIcon(QMessageBox.Critical)
-                    msg.setWindowTitle("错误")
-                    msg.setText("模板加载失败")
-                    msg.setStyleSheet(MODERN_FLAT_STYLE)
-                    msg.exec()
+            if dialog.exec() == QDialog.Accepted:
+                template_name = dialog.get_selected_template()
+                if template_name:
+                    template = self.template_manager.get_template_by_name(template_name)
+                    if template:
+                        self.subject_input_compose.setText(template.get('subject', ''))
+                        self.body_input.setPlainText(template.get('content', ''))
+                    else:
+                        msg = QMessageBox(self)
+                        msg.setIcon(QMessageBox.Critical)
+                        msg.setWindowTitle("错误")
+                        msg.setText("模板加载失败")
+                        msg.setStyleSheet(MODERN_FLAT_STYLE)
+                        msg.exec()
             
         except Exception as e:
             msg = QMessageBox(self)
@@ -877,17 +1044,19 @@ class MainWindow(QMainWindow):
         
         # 创建模板选择对话框
         template_names = list(templates.keys())
-        item, ok = QInputDialog.getItem(self, "选择模板", "请选择AI提示词模板:", template_names, 0, False)
+        dialog = TemplateSelectDialog(template_names, self)
         
-        if ok and item:
-            # 将选中的模板插入到AI提示词输入框
-            if hasattr(self, 'ai_prompt_input'):
-                self.ai_prompt_input.setPlainText(templates[item])
-                self.status_bar.showMessage(f"已选择模板: {item}")
-            else:
-                # 如果没有专门的AI提示词输入框，就插入到内容输入框
-                self.content_input.setPlainText(templates[item])
-                self.status_bar.showMessage(f"已选择模板: {item}，请在AI生成时使用")
+        if dialog.exec() == QDialog.Accepted:
+            item = dialog.get_selected_template()
+            if item:
+                # 将选中的模板插入到AI提示词输入框
+                if hasattr(self, 'ai_prompt_input'):
+                    self.ai_prompt_input.setPlainText(templates[item])
+                    self.status_bar.showMessage(f"已选择模板: {item}")
+                else:
+                    # 如果没有专门的AI提示词输入框，就插入到内容输入框
+                    self.content_input.setPlainText(templates[item])
+                    self.status_bar.showMessage(f"已选择模板: {item}，请在AI生成时使用")
         
     def generate_mail(self):
         """生成邮件"""
